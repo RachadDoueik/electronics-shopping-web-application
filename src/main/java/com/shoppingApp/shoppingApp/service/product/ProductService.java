@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import com.shoppingApp.shoppingApp.model.Product;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import com.shoppingApp.shoppingApp.exceptions.*;
 
 @Service
 @RequiredArgsConstructor
@@ -19,12 +20,13 @@ public class ProductService implements IProductService {
 
     @Override
     public Product getProductById(Long id) {
-        return null;
+        return productRepository.findById(id)
+                .orElseThrow(()-> new ProductNotFoundException("Product Not Found !"));
     }
 
     @Override
     public void deleteProductById(Long id) {
-
+        productRepository.findById(id).ifPresentOrElse(productRepository::delete , ()-> {throw new ProductNotFoundException("Product Not Found !");});
     }
 
     @Override
