@@ -1,16 +1,19 @@
 package com.shoppingApp.shoppingApp.service.product;
 import com.shoppingApp.shoppingApp.model.Product;
+import com.shoppingApp.shoppingApp.requests.AddProductRequest;
+import com.shoppingApp.shoppingApp.requests.UpdateProductRequest;
+
 import java.util.List;
 
 public interface IProductService {
 
-    Product addProduct(Product product);
+    Product addProduct(AddProductRequest addProductRequest);
 
     Product getProductById(Long id);
 
     void deleteProductById(Long id);
 
-    void updateProduct(Product product , Long productId);
+    Product updateProduct(UpdateProductRequest updateProductRequest, Long productId);
 
     List<Product> getAllProducts();
 
