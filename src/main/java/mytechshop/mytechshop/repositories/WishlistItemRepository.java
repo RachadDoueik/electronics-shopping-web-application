@@ -4,9 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import mytechshop.mytechshop.models.*;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WishlistItemRepository extends JpaRepository<WishlistItem, Long> {
-    // Custom query methods can be added here
-    List<WishlistItem> findByWishlistId(Long wishlistId); // Example: Find wishlist items by wishlist ID
+    List<WishlistItem> findByWishlist(Wishlist wishlist);
+    Optional<WishlistItem> findByWishlistAndProduct(Wishlist wishlist, Product product);
+    void deleteByWishlist(Wishlist wishlist);
 }

@@ -8,10 +8,11 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-
-    // Custom query method to find products by category
     List<Product> findByCategory(Category category);
-
-    // Custom query method to find products by name
+    List<Product> findByBrand(Brand brand);
+    List<Product> findByPriceBetween(Double minPrice, Double maxPrice);
     List<Product> findByNameContainingIgnoreCase(String name);
+    List<Product> findByAvailableTrue();
+    List<Product> findByStockGreaterThan(Integer stock);
+    void deleteByCategory(Category category);
 }

@@ -1,13 +1,17 @@
 package mytechshop.mytechshop.interfaces;
 
+import mytechshop.mytechshop.enums.Role;
 import mytechshop.mytechshop.models.User;
 import java.util.List;
+import java.util.Optional;
 
 public interface IUserService {
-    User registerUser(User user);
-    User getUserById(Long userId);
-    User getUserByEmail(String email);
+    User saveUser(User user);
+    User updateUser(Long id, User user);
+    Optional<User> getUserById(Long id);
+    Optional<User> getUserByEmail(String email);
     List<User> getAllUsers();
-    User updateUser(User updatedUser);
-    void deleteUser(Long userId);
+    List<User> getUsersByRole(Role role);
+    boolean existsByEmail(String email);
+    void deleteUser(Long id);
 }
