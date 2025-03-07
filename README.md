@@ -1,1 +1,1 @@
-# simple-ecommerce-application
+ecommerce-application
