@@ -34,4 +34,9 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    // Many products can belong to one brand
+    @ManyToOne
+    @JoinColumn(name = "brand_id", nullable = false)
+    private Brand brand;
 }
