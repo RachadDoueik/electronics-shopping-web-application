@@ -1,10 +1,10 @@
-package com.shoppingApp.shoppingApp;
+package mytechshop.mytechshop;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ShoppingAppApplicationTests {
+class MytechshopApplicationTests {
 
 	@Test
 	void contextLoads() {
