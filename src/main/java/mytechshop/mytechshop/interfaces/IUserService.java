@@ -4,10 +4,11 @@ import mytechshop.mytechshop.enums.Role;
 import mytechshop.mytechshop.models.User;
 import java.util.List;
 import java.util.Optional;
+import mytechshop.mytechshop.requests.*;
 
 public interface IUserService {
-    User saveUser(User user);
-    User updateUser(Long id, User user);
+    User createUser(CreateUserRequest request);
+    User updateUser(Long id, UpdateUserRequest request);
     Optional<User> getUserById(Long id);
     Optional<User> getUserByEmail(String email);
     List<User> getAllUsers();

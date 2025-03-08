@@ -6,7 +6,6 @@ import mytechshop.mytechshop.models.Category;
 import mytechshop.mytechshop.models.Product;
 import mytechshop.mytechshop.repositories.ProductRepository;
 import mytechshop.mytechshop.interfaces.IProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
