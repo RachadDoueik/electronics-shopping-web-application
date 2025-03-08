@@ -1,37 +1,56 @@
 package mytechshop.mytechshop.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "cart_items")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Many CartItems belong to one Cart
     @ManyToOne
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    // Many CartItems refer to one Product
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // The quantity of the product in the cart
     @Column(nullable = false)
     private Integer quantity;
 
-    // You can add additional fields like total price for this CartItem if needed.
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }

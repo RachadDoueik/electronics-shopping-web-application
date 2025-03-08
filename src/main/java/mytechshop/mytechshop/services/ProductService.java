@@ -7,23 +7,25 @@ import mytechshop.mytechshop.requests.UpdateProductRequest;
 import mytechshop.mytechshop.models.*;
 import mytechshop.mytechshop.repositories.ImageRepository;
 import mytechshop.mytechshop.repositories.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-@Validated
 public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
+
     private final ImageRepository imageRepository;
 
+    public ProductService(ProductRepository productRepository, ImageRepository imageRepository) {
+        this.productRepository = productRepository;
+        this.imageRepository = imageRepository;
+    }
+
     @Override
-    public Product createProduct(@Valid CreateProductRequest createProductRequest) {
+    public Product createProduct(CreateProductRequest createProductRequest) {
         // Create product entity
         Product product = new Product();
         product.setName(createProductRequest.getName());
@@ -54,7 +56,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product updateProduct(Long id, @Valid UpdateProductRequest updateProductRequest) {
+    public Product updateProduct(Long id, UpdateProductRequest updateProductRequest) {
         // Fetch existing product
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));

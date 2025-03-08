@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUser(User user);
     List<Order> findByStatus(OrderStatus status);
-    List<Order> findByCreatedAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
+    List<Order> findByOrderDateBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
     Optional<Order> findById(Long orderId);
     void deleteById(Long orderId);
     void deleteByUser(User user);

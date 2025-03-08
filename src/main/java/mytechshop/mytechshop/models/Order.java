@@ -1,17 +1,12 @@
 package mytechshop.mytechshop.models;
 
 import jakarta.persistence.*;
-import lombok.*;
 import mytechshop.mytechshop.enums.OrderStatus;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
 @Table(name = "orders")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Order {
 
     @Id
@@ -27,11 +22,60 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus status; // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELED
+    private OrderStatus status;
 
     @Column(nullable = false)
     private Double totalPrice;
 
     @Column(nullable = false)
     private LocalDateTime orderDate;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Set<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(Set<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public Double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
 }

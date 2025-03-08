@@ -1,6 +1,5 @@
 package mytechshop.mytechshop.services;
 
-import lombok.RequiredArgsConstructor;
 import mytechshop.mytechshop.enums.Role;
 import mytechshop.mytechshop.models.User;
 import mytechshop.mytechshop.repositories.UserRepository;
@@ -14,12 +13,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Service
-@RequiredArgsConstructor
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder; // Ensure passwords are encoded before saving
 
+    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public User createUser(CreateUserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {

@@ -1,19 +1,10 @@
 package mytechshop.mytechshop.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import jakarta.persistence.*;
 import java.util.Set;
 
 @Entity
 @Table(name = "wishlists")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Wishlist {
 
     @Id
@@ -26,4 +17,29 @@ public class Wishlist {
 
     @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WishlistItem> items;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Set<WishlistItem> getItems() {
+        return items;
+    }
+
+    public void setItems(Set<WishlistItem> items) {
+        this.items = items;
+    }
 }
