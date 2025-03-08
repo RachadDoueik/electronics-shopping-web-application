@@ -1,13 +1,14 @@
 package mytechshop.mytechshop.interfaces;
 
+import mytechshop.mytechshop.models.Order;
+import mytechshop.mytechshop.models.User;
+import mytechshop.mytechshop.enums.OrderStatus;
+
 import java.util.List;
 import java.util.Optional;
 
-import mytechshop.mytechshop.enums.OrderStatus;
-import mytechshop.mytechshop.models.*;
-
 public interface IOrderService {
-    Order placeOrder(User user, List<OrderItem> orderItems);
+    Order placeOrder(Order order); // Takes an Order object instead of User and OrderItems
     Optional<Order> getOrderById(Long id);
     List<Order> getOrdersByUser(User user);
     List<Order> getOrdersByStatus(OrderStatus status);
