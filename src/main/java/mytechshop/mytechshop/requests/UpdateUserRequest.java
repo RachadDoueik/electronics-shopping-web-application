@@ -10,10 +10,12 @@ import lombok.Setter;
 @Setter
 public class UpdateUserRequest {
 
+    @NotBlank
     private String name;
 
     @Email
     private String email;
 
+    @NotBlank
     private String password;
 }

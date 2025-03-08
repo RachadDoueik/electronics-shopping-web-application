@@ -2,6 +2,9 @@ package mytechshop.mytechshop.requests;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import mytechshop.mytechshop.models.Category;
+import mytechshop.mytechshop.models.Brand;
+import java.util.List;
 
 @Data
 public class CreateProductRequest {
@@ -21,9 +24,11 @@ public class CreateProductRequest {
     @Min(value = 0, message = "Stock must be a non-negative number")
     private Integer stock;
 
-    @NotNull(message = "Category ID is required")
-    private Long categoryId;
+    @NotNull(message = "Category is required")
+    private Category category; // Category object
 
-    @NotNull(message = "Brand ID is required")
-    private Long brandId;
+    @NotNull(message = "Brand is required")
+    private Brand brand; // Brand object
+
+    private List<String> imageUrls; // List of image URLs
 }
