@@ -1,16 +1,17 @@
 package mytechshop.mytechshop.interfaces;
 
+import mytechshop.mytechshop.requests.CreateProductRequest;
+import mytechshop.mytechshop.requests.UpdateProductRequest;
+import mytechshop.mytechshop.models.Product;
 import java.util.List;
-import java.util.Optional;
-import mytechshop.mytechshop.models.*;
 
 public interface IProductService {
-    Product saveProduct(Product product);
-    Product updateProduct(Long id, Product product);
-    Optional<Product> getProductById(Long id);
+    Product createProduct(CreateProductRequest createProductRequest);
+    Product updateProduct(Long id, UpdateProductRequest updateProductRequest);
+    Product getProductById(Long id);
     List<Product> getAllProducts();
-    List<Product> getProductsByCategory(Category category);
-    List<Product> getProductsByBrand(Brand brand);
+    List<Product> getProductsByCategory(Long categoryId);
+    List<Product> getProductsByBrand(Long brandId);
     List<Product> getProductsByPriceRange(Double minPrice, Double maxPrice);
     List<Product> searchProductsByName(String name);
     List<Product> getAvailableProducts();

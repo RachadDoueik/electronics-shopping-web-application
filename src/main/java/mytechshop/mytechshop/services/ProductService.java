@@ -1,21 +1,78 @@
 package mytechshop.mytechshop.services;
 
 import lombok.RequiredArgsConstructor;
-import mytechshop.mytechshop.models.Brand;
-import mytechshop.mytechshop.models.Category;
-import mytechshop.mytechshop.models.Product;
-import mytechshop.mytechshop.repositories.ProductRepository;
 import mytechshop.mytechshop.interfaces.IProductService;
+import mytechshop.mytechshop.requests.CreateProductRequest;
+import mytechshop.mytechshop.requests.UpdateProductRequest;
+import mytechshop.mytechshop.models.*;
+import mytechshop.mytechshop.repositories.BrandRepository;
+import mytechshop.mytechshop.repositories.CategoryRepository;
+import mytechshop.mytechshop.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
+
+    @Override
+    public Product createProduct(@Valid CreateProductRequest createProductRequest) {
+        // Fetch category and brand
+        Category category = categoryRepository.findById(createProductRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        Brand brand = brandRepository.findById(createProductRequest.getBrandId())
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
+
+        // Create product entity
+        Product product = Product.builder()
+                .name(createProductRequest.getName())
+                .description(createProductRequest.getDescription())
+                .price(createProductRequest.getPrice())
+                .stock(createProductRequest.getStock())
+                .category(category)
+                .brand(brand)
+                .build();
+
+        // Save and return product
+        return productRepository.save(product);
+    }
+
+    @Override
+    public Product updateProduct(Long id, @Valid UpdateProductRequest updateProductRequest) {
+        // Fetch existing product
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Fetch category and brand
+        Category category = categoryRepository.findById(updateProductRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        Brand brand = brandRepository.findById(updateProductRequest.getBrandId())
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
+
+        // Update product fields
+        product.setName(updateProductRequest.getName());
+        product.setDescription(updateProductRequest.getDescription());
+        product.setPrice(updateProductRequest.getPrice());
+        product.setStock(updateProductRequest.getStock());
+        product.setCategory(category);
+        product.setBrand(brand);
+
+        // Save and return updated product
+        return productRepository.save(product);
+    }
+
+    @Override
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+    }
 
     @Override
     public List<Product> getAllProducts() {
@@ -23,17 +80,16 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
-    }
-
-    @Override
-    public List<Product> getProductsByCategory(Category category) {
+    public List<Product> getProductsByCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
         return productRepository.findByCategory(category);
     }
 
     @Override
-    public List<Product> getProductsByBrand(Brand brand) {
+    public List<Product> getProductsByBrand(Long brandId) {
+        Brand brand = brandRepository.findById(brandId)
+                .orElseThrow(() -> new RuntimeException("Brand not found"));
         return productRepository.findByBrand(brand);
     }
 
@@ -49,27 +105,7 @@ public class ProductService implements IProductService {
 
     @Override
     public List<Product> getAvailableProducts() {
-        return productRepository.findByAvailableTrue();
-    }
-
-    @Override
-    public Product saveProduct(Product product) {
-        return productRepository.save(product);
-    }
-
-    @Override
-    public Product updateProduct(Long id, Product product) {
-        return productRepository.findById(id)
-                .map(existingProduct -> {
-                    existingProduct.setName(product.getName());
-                    existingProduct.setDescription(product.getDescription());
-                    existingProduct.setPrice(product.getPrice());
-                    existingProduct.setStock(product.getStock());
-                    existingProduct.setCategory(product.getCategory());
-                    existingProduct.setBrand(product.getBrand());
-                    return productRepository.save(existingProduct);
-                })
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+        return productRepository.findByStockGreaterThan(0);
     }
 
     @Override
