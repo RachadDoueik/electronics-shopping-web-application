@@ -6,6 +6,8 @@ import mytechshop.mytechshop.repositories.UserRepository;
 import mytechshop.mytechshop.interfaces.IUserService;
 import mytechshop.mytechshop.requests.CreateUserRequest;
 import mytechshop.mytechshop.requests.UpdateUserRequest;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -21,20 +23,6 @@ public class UserService implements IUserService {
     public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    public User createUser(CreateUserRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already in use");
-        }
-
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // Encrypt password
-        user.setRole(request.getRole());
-
-        return userRepository.save(user);
     }
 
     @Override
