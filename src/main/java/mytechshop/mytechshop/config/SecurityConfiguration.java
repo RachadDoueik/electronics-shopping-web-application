@@ -33,7 +33,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                              .anyRequest().permitAll()// Allow unauthenticated access to /auth/**
+                        .anyRequest().permitAll()// Allow unauthenticated access to /auth/**
                 )
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection
                 .sessionManagement(session -> session

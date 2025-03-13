@@ -1,82 +1,114 @@
 package mytechshop.mytechshop.services;
 
-import mytechshop.mytechshop.interfaces.IImageService;
 import mytechshop.mytechshop.models.Image;
 import mytechshop.mytechshop.models.Product;
 import mytechshop.mytechshop.repositories.ImageRepository;
-import mytechshop.mytechshop.repositories.ProductRepository;
-import mytechshop.mytechshop.requests.CreateImageRequest;
-import mytechshop.mytechshop.requests.UpdateImageRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
-public class ImageService implements IImageService {
-
+public class ImageService {
 
     private final ImageRepository imageRepository;
 
-    private final ProductRepository productRepository;
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
-
-    public ImageService(ImageRepository imageRepository , ProductRepository productRepository){
+    public ImageService(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
-        this.productRepository = productRepository;
     }
 
-    @Override
-    public Image createImage(CreateImageRequest createImageRequest) {
-        // Fetch the product by ID
-        Product product = productRepository.findById(createImageRequest.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + createImageRequest.getProductId()));
-
-        // Create and save the image
-        Image image = new Image();
-        image.setImageUrl(createImageRequest.getImageUrl());
-        image.setProduct(product);
-        return imageRepository.save(image);
+    // Upload multiple images and return their URLs
+    public List<String> uploadImages(List<MultipartFile> files) {
+        List<String> imageUrls = new ArrayList<>();
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                imageUrls.add(uploadImage(file));
+            }
+        }
+        return imageUrls;
     }
 
-    @Override
-    public Image updateImage(Long id, UpdateImageRequest updateImageRequest) {
-        // Fetch the existing image
-        Image existingImage = imageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Image not found with id: " + id));
+    // Upload a single image and return its URL
+    public String uploadImage(MultipartFile file) {
+        validateImageFile(file);
 
-        // Fetch the product by ID
-        Product product = productRepository.findById(updateImageRequest.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + updateImageRequest.getProductId()));
+        // Create the upload directory if it doesn't exist
+        File uploadDirFile = new File(uploadDir);
+        if (!uploadDirFile.exists()) {
+            uploadDirFile.mkdirs();
+        }
 
-        // Update the image fields
-        existingImage.setImageUrl(updateImageRequest.getImageUrl());
-        existingImage.setProduct(product);
-        return imageRepository.save(existingImage);
+        // Generate a unique file name
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        String filePath = Paths.get(uploadDir, fileName).toString();
+
+        try {
+            // Save the file to the server
+            file.transferTo(new File(filePath));
+
+            // Generate the image URL
+            return ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(fileName)
+                    .toUriString();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload image", e);
+        }
     }
 
-    @Override
-    public Image getImageById(Long id) {
-        return imageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Image not found with id: " + id));
+    // Save image URLs to the database and associate them with a product
+    public List<Image> saveImages(List<String> imageUrls, Product product) {
+        List<Image> images = new ArrayList<>();
+        for (String imageUrl : imageUrls) {
+            Image image = new Image();
+            image.setImageUrl(imageUrl);
+            image.setProduct(product);
+            images.add(image);
+        }
+        return imageRepository.saveAll(images); // Save all images in a batch
     }
 
-    @Override
-    public List<Image> getAllImages() {
-        return imageRepository.findAll();
+    // Validate file type
+    private void validateImageFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png"))) {
+            throw new IllegalArgumentException("Only JPEG and PNG images are allowed");
+        }
     }
 
-    @Override
-    public void deleteImage(Long id) {
-        imageRepository.deleteById(id);
+    // Delete images associated with a product
+    public void deleteImagesByProduct(Product product) {
+        List<Image> images = imageRepository.findByProduct(product);
+        for (Image image : images) {
+            deleteImageFile(image.getImageUrl());
+        }
+        imageRepository.deleteAll(images);
     }
 
-    @Override
-    public List<Image> getImagesByProductId(Long productId) {
-        // Fetch the product by ID
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+    // Helper method to delete the image file from the server
+    private void deleteImageFile(String imageUrl) {
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            // Extract the file name from the URL
+            String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+            File file = new File(Paths.get(uploadDir, fileName).toString());
 
-        // Return images associated with the product
-        return imageRepository.findByProduct(product);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
     }
 }

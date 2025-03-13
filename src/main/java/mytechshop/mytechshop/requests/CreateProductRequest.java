@@ -3,6 +3,9 @@ package mytechshop.mytechshop.requests;
 import jakarta.validation.constraints.*;
 import mytechshop.mytechshop.models.Category;
 import mytechshop.mytechshop.models.Brand;
+import mytechshop.mytechshop.models.Color;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 public class CreateProductRequest {
@@ -28,7 +31,12 @@ public class CreateProductRequest {
     @NotNull(message = "Brand is required")
     private Brand brand; // Brand object
 
+    @NotNull(message = "Color is required")
+    private Color color;
+
     private List<String> imageUrls; // List of image URLs
+
+    private List<MultipartFile> images;
 
     // Getters and Setters
     public String getName() {
@@ -79,6 +87,14 @@ public class CreateProductRequest {
         this.brand = brand;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public List<String> getImageUrls() {
         return imageUrls;
     }
@@ -86,4 +102,14 @@ public class CreateProductRequest {
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
+
+    public List<MultipartFile> getImages() {
+        return images;
+    }
+
+    public void setImages(List<MultipartFile> images){
+        this.images = images;
+    }
+
+   // Accept images as MultipartFile(s)
 }

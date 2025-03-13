@@ -1,11 +1,12 @@
 package mytechshop.mytechshop.models;
 
 import jakarta.persistence.*;
+
 import java.util.Set;
 
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "colors")
+public class Color {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,7 +15,10 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "category")
+    @Column(nullable = false , unique = true)
+    private String hexCode; // Additional metadata (e.g., #FF0000 for red)
+
+    @OneToMany(mappedBy = "color")
     private Set<Product> products;
 
     // Getters and Setters
@@ -34,11 +38,21 @@ public class Category {
         this.name = name;
     }
 
-    public Set<Product> getProducts() {
+    public String getHexCode() {
+        return hexCode;
+    }
+
+    public void setHexCode(String hexCode) {
+        this.hexCode = hexCode;
+    }
+
+    public Set<Product> getProducts(){
         return products;
     }
 
-    public void setProducts(Set<Product> products) {
-        this.products = products;
+    public void setProducts(Set<Product> products){
+          this.products = products;
     }
+
+
 }

@@ -90,7 +90,7 @@ public class JwtService {
 
 
     private Key getSignInKey() {
-        String secretKey = "${security.jwt.secret-key}";
+        String secretKey = "2e5d430d0a21765cd0203c301a16b385f150a087b0ec07408adffc57f93d64ad60eb749268ee822a48b55022dd097d570b0b9fe7ab2fe63a3de924766c282a428becd2727ac27eb55270173b7eb47f08628cfe25d94e450ca72effde73bb732bd5d7fdfd1bb1da7cba681b515495a8ef5b2a302ff3fe01774ae2a08eba62149a236e9ad537f2be4aa6ba30c0871f51f2aaf652987c64f243cf6b1096035ca717424ce74f048fc5f2dd97c4ae3139be8afe2b996b79d7429ee47017f05e121c9540c5de68e3a933af94adccfdce3bec207ff0e9ede212c0b11a4957239aa8a2284c6b932c7975b0ea25b2bfb44bdaf1709ad45fcdf84136e2d2d4f6f780509363";
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

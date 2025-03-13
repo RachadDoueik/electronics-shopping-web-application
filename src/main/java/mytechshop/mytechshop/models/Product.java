@@ -24,6 +24,10 @@ public class Product {
     private Integer stock;
 
     @ManyToOne
+    @JoinColumn(name = "color_id", nullable = false)
+    private Color color;
+
+    @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
@@ -98,4 +102,8 @@ public class Product {
     public void setImages(List<Image> images) {
         this.images = images;
     }
+
+    public Color getColor(){return color;}
+
+    public void setColor(Color color){this.color = color;}
 }

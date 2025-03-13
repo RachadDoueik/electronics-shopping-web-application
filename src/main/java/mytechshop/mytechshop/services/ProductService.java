@@ -1,30 +1,28 @@
 package mytechshop.mytechshop.services;
 
-import lombok.RequiredArgsConstructor;
-import mytechshop.mytechshop.interfaces.IProductService;
+import mytechshop.mytechshop.models.Color;
+import mytechshop.mytechshop.models.Image;
+import mytechshop.mytechshop.models.Product;
+import mytechshop.mytechshop.repositories.ProductRepository;
 import mytechshop.mytechshop.requests.CreateProductRequest;
 import mytechshop.mytechshop.requests.UpdateProductRequest;
-import mytechshop.mytechshop.models.*;
-import mytechshop.mytechshop.repositories.ImageRepository;
-import mytechshop.mytechshop.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-public class ProductService implements IProductService {
+public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ImageService imageService;
 
-    private final ImageRepository imageRepository;
-
-    public ProductService(ProductRepository productRepository, ImageRepository imageRepository) {
+    public ProductService(ProductRepository productRepository, ImageService imageService) {
         this.productRepository = productRepository;
-        this.imageRepository = imageRepository;
+        this.imageService = imageService;
     }
 
-    @Override
+    @Transactional
     public Product createProduct(CreateProductRequest createProductRequest) {
         // Create product entity
         Product product = new Product();
@@ -32,112 +30,86 @@ public class ProductService implements IProductService {
         product.setDescription(createProductRequest.getDescription());
         product.setPrice(createProductRequest.getPrice());
         product.setStock(createProductRequest.getStock());
-        product.setCategory(createProductRequest.getCategory()); // Set category directly
-        product.setBrand(createProductRequest.getBrand()); // Set brand directly
+        product.setCategory(createProductRequest.getCategory());
+        product.setBrand(createProductRequest.getBrand());
+        product.setColor(createProductRequest.getColor());
 
-        // Save product
+        // Save product first
         Product savedProduct = productRepository.save(product);
 
-        // Add images to the product
-        if (createProductRequest.getImageUrls() != null && !createProductRequest.getImageUrls().isEmpty()) {
-            List<Image> images = createProductRequest.getImageUrls().stream()
-                    .map(url -> {
-                        Image image = new Image();
-                        image.setImageUrl(url);
-                        image.setProduct(savedProduct); // Associate image with the product
-                        return image;
-                    })
-                    .collect(Collectors.toList());
-            imageRepository.saveAll(images); // Save all images
-            savedProduct.setImages(images); // Set images in the product
+        // Upload images and associate them with the product
+        if (createProductRequest.getImages() != null && !createProductRequest.getImages().isEmpty()) {
+            List<String> imageUrls = imageService.uploadImages(createProductRequest.getImages());
+            List<Image> images = imageService.saveImages(imageUrls, savedProduct);
+            savedProduct.setImages(images);
         }
 
         return savedProduct;
     }
 
-    @Override
-    public Product updateProduct(Long id, UpdateProductRequest updateProductRequest) {
-        // Fetch existing product
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    @Transactional
+    public Product updateProduct(Long id, UpdateProductRequest updatedProduct) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
-        // Update product fields
-        product.setName(updateProductRequest.getName());
-        product.setDescription(updateProductRequest.getDescription());
-        product.setPrice(updateProductRequest.getPrice());
-        product.setStock(updateProductRequest.getStock());
-        product.setCategory(updateProductRequest.getCategory()); // Set category directly
-        product.setBrand(updateProductRequest.getBrand()); // Set brand directly
+        // Update basic fields
+        existingProduct.setName(updatedProduct.getName());
+        existingProduct.setDescription(updatedProduct.getDescription());
+        existingProduct.setPrice(updatedProduct.getPrice());
+        existingProduct.setStock(updatedProduct.getStock());
+        existingProduct.setCategory(updatedProduct.getCategory());
+        existingProduct.setBrand(updatedProduct.getBrand());
+        existingProduct.setColor(updatedProduct.getColor());
 
-        // Update images
-        if (updateProductRequest.getImageUrls() != null) {
-            // Delete existing images
-            imageRepository.deleteByProduct(product);
-
-            // Add new images
-            List<Image> images = updateProductRequest.getImageUrls().stream()
-                    .map(url -> {
-                        Image image = new Image();
-                        image.setImageUrl(url);
-                        image.setProduct(product); // Associate image with the product
-                        return image;
-                    })
-                    .collect(Collectors.toList());
-            imageRepository.saveAll(images); // Save all images
-            product.setImages(images); // Set images in the product
+        // Update image URLs
+        if (updatedProduct.getImageUrls() != null) {
+            List<Image> images = imageService.saveImages(updatedProduct.getImageUrls(), existingProduct);
+            existingProduct.setImages(images);
         }
 
-        // Save and return updated product
-        return productRepository.save(product);
+        return productRepository.save(existingProduct);
     }
 
-    @Override
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
     }
 
-    @Override
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    @Override
-    public List<Product> getProductsByCategory(Category category) {
-        // Fetch products by category
-        return productRepository.findByCategory(category);
+    public List<Product> getProductsByCategoryId(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
     }
 
-    @Override
-    public List<Product> getProductsByBrand(Brand brand) {
-        // Fetch products by brand
-        return productRepository.findByBrand(brand);
+    public List<Product> getProductsByBrandId(Long brandId) {
+        return productRepository.findByBrandId(brandId);
     }
 
-    @Override
+    public List<Product> getProductsByColor(Color color) {
+        return productRepository.findByColor(color);
+    }
+
     public List<Product> getProductsByPriceRange(Double minPrice, Double maxPrice) {
-        // Fetch products within the specified price range
         return productRepository.findByPriceBetween(minPrice, maxPrice);
     }
 
-    @Override
     public List<Product> searchProductsByName(String name) {
-        // Fetch products by name (case-insensitive search)
         return productRepository.findByNameContainingIgnoreCase(name);
     }
 
-    @Override
     public List<Product> getAvailableProducts() {
-        // Fetch products with stock greater than 0
         return productRepository.findByStockGreaterThan(0);
     }
 
-    @Override
+    @Transactional
     public void deleteProduct(Long id) {
-        // Delete associated images first
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        imageRepository.deleteByProduct(product);
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        // Delete associated images
+        imageService.deleteImagesByProduct(product);
 
         // Delete the product
         productRepository.deleteById(id);

@@ -1,6 +1,5 @@
 package mytechshop.mytechshop.services;
 
-
 import mytechshop.mytechshop.requests.CreateUserRequest;
 import mytechshop.mytechshop.requests.LoginRequest;
 import mytechshop.mytechshop.models.User;
@@ -13,19 +12,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService {
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final AuthenticationManager authenticationManager;
+    private final CartService cartService; // Add CartService
+    private final WishlistService wishlistService; // Add WishlistService
 
     public AuthenticationService(
             UserRepository userRepository,
             AuthenticationManager authenticationManager,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            CartService cartService, // Inject CartService
+            WishlistService wishlistService // Inject WishlistService
     ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.cartService = cartService;
+        this.wishlistService = wishlistService;
     }
 
     public User signUp(CreateUserRequest request) {
@@ -39,7 +42,16 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.getPassword())); // Encrypt password
         user.setRole(request.getRole());
 
-        return userRepository.save(user);
+        // Save the user
+        User savedUser = userRepository.save(user);
+
+        // Create a cart for the user
+        cartService.createCart(savedUser);
+
+        // Create a wishlist for the user
+        wishlistService.createWishlist(savedUser);
+
+        return savedUser;
     }
 
     public User login(LoginRequest input) {

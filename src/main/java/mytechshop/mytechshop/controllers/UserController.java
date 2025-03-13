@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/users") // Base URL for all endpoints in this controller
+@RequestMapping("api/users") // Base URL for all endpoints in this controller
 public class UserController {
 
     private final UserService userService;

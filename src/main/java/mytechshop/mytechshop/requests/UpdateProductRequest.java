@@ -3,6 +3,8 @@ package mytechshop.mytechshop.requests;
 import jakarta.validation.constraints.*;
 import mytechshop.mytechshop.models.Category;
 import mytechshop.mytechshop.models.Brand;
+import mytechshop.mytechshop.models.Color;
+
 import java.util.List;
 
 public class UpdateProductRequest {
@@ -27,6 +29,9 @@ public class UpdateProductRequest {
 
     @NotNull(message = "Brand is required")
     private Brand brand; // Brand object
+
+    @NotNull(message = "Color is required")
+    private Color color; // Color object
 
     private List<String> imageUrls; // List of image URLs
 
@@ -81,6 +86,14 @@ public class UpdateProductRequest {
 
     public List<String> getImageUrls() {
         return imageUrls;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public void setImageUrls(List<String> imageUrls) {

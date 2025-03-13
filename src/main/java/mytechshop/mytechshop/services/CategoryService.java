@@ -34,7 +34,6 @@ public class CategoryService implements ICategoryService {
 
         // Update the category fields
         existingCategory.setName(category.getName());
-        existingCategory.setDescription(category.getDescription());
         return categoryRepository.save(existingCategory);
     }
 
